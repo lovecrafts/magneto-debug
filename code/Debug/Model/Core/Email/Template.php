@@ -159,10 +159,39 @@ if (Mage::helper('core')->isModuleEnabled('Aschroder_SMTPPro')) {
 
 } else if(Mage::helper('core')->isModuleEnabled('Ebizmarts_Mandrill')) {
 
-
     class Sheep_Debug_Model_Core_Email_Template extends Ebizmarts_Mandrill_Model_Email_Template
     {
         use Sheep_Debug_Model_Core_Email_Template_Capture;
+
+        public function addEmailToProfile($email, $name, $variables, $result, $mail)
+        {
+            $emailCapture = Mage::getModel('sheep_debug/email');
+
+            $emailCapture->setFromName($this->getSenderName());
+            $emailCapture->setFromEmail($this->getSenderEmail());
+
+            $emailCapture->setToEmail($email);
+            $emailCapture->setToName($name);
+
+            if (Mage::helper('mandrill')->useTransactionalService()) {
+                $subject = $this->getProcessedTemplateSubject($variables);
+                $body = $this->getProcessedTemplate($variables, true);
+            } else {
+                $subject = $this->decodeSubject($mail->getSubject());
+                $body = $this->getContent($mail);
+            }
+
+            $emailCapture->setSubject($subject);
+            $emailCapture->setBody($body);
+
+            $emailCapture->setIsPlain($this->isPlain());
+            $emailCapture->setIsAccepted($result);
+            $emailCapture->setVariables($variables);
+            $emailCapture->setIsSmtpDisabled((bool)Mage::getStoreConfigFlag('system/smtp/disable'));
+
+
+            Mage::getSingleton('sheep_debug/observer')->getRequestInfo()->addEmail($emailCapture);
+        }
     }
 
 } else {
