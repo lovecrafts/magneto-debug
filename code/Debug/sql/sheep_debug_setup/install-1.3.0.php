@@ -54,7 +54,7 @@ $table = $installer->getConnection()
     ->addColumn('peak_memory', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
         'nullable' => false
     ), 'Peak Memory used in bytes')
-    ->addColumn('info', Varien_Db_Ddl_Table::TYPE_BLOB, 16777216, array(
+    ->addColumn('info', Varien_Db_Ddl_Table::TYPE_BLOB, 4294967295, array(
         'nullable' => false,
         'default'  => '',
     ), 'Serialized Info')
