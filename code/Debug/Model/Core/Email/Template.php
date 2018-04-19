@@ -44,10 +44,12 @@ trait Sheep_Debug_Model_Core_Email_Template_Capture
 
         $result = $this->parentSend($email, $name, $variables);
 
-        try {
-            $this->addEmailToProfile($email, $name, $variables, $result, $zendMail);
-        } catch (Exception $e) {
-            Mage::logException($e);
+        if (Mage::helper('sheep_debug')->canCapture()) {
+            try {
+                $this->addEmailToProfile($email, $name, $variables, $result, $zendMail);
+            } catch (Exception $e) {
+                Mage::logException($e);
+            }
         }
 
         return $result;
